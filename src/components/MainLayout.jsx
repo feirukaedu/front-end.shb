@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   MessageSquare, Upload, BarChart2, Layers, LogOut, Sun, Moon,
-  Columns, Settings2, User, ShieldCheck, Settings
+  Columns, Settings2, User, ShieldCheck, Settings, Menu, X
 } from 'lucide-react';
 
 export default function MainLayout({ children, role }) {
@@ -10,6 +10,7 @@ export default function MainLayout({ children, role }) {
   const navigate = useNavigate();
   
   const [isDark, setIsDark] = useState(false);
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
 
   useEffect(() => {
     if (isDark) {
@@ -18,6 +19,10 @@ export default function MainLayout({ children, role }) {
       document.documentElement.classList.remove('dark');
     }
   }, [isDark]);
+
+  useEffect(() => {
+    setIsSidebarOpen(false);
+  }, [location.pathname]);
 
   // Define Menus based on Role
   let menuItems = [];
@@ -57,18 +62,33 @@ export default function MainLayout({ children, role }) {
 
   return (
     <div className="flex h-screen bg-slate-50 dark:bg-slate-900 overflow-hidden font-sans transition-colors duration-300">
+      
+      {/* Mobile Overlay */}
+      {isSidebarOpen && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-20 md:hidden transition-opacity" 
+          onClick={() => setIsSidebarOpen(false)} 
+        />
+      )}
+
       {/* Sidebar */}
-      <aside className="w-72 bg-shb-navy text-white flex flex-col justify-between shadow-xl z-20 transition-colors duration-300">
+      <aside className={`fixed md:relative inset-y-0 left-0 w-72 bg-shb-navy text-white flex flex-col justify-between shadow-xl z-30 transition-transform duration-300 ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'}`}>
         <div>
           {/* Logo & Header */}
-          <div className="p-6 border-b border-shb-navy-light">
+          <div className="p-6 border-b border-shb-navy-light flex items-center justify-between">
             <div className="bg-white py-3 px-4 rounded-xl w-full flex items-center justify-center shadow-sm">
               <img src="/Logo-SHB-VN.png" alt="SHB Logo" className="h-10 w-auto object-contain" />
             </div>
+            <button 
+              className="md:hidden ml-4 p-2 text-slate-300 hover:text-white"
+              onClick={() => setIsSidebarOpen(false)}
+            >
+              <X className="w-6 h-6" />
+            </button>
           </div>
 
           {/* Navigation Menu */}
-          <nav className="mt-6 px-4 space-y-2">
+          <nav className="mt-6 px-4 space-y-2 overflow-y-auto">
             <div className="px-4 pb-2">
               <h1 className="text-[11px] font-extrabold text-slate-400 tracking-widest uppercase">
                 Không gian làm việc
@@ -125,14 +145,21 @@ export default function MainLayout({ children, role }) {
       {/* Main Content Area */}
       <div className="flex-1 flex flex-col overflow-hidden relative">
         {/* Top Header */}
-        <header className="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-8 shadow-sm z-10 transition-colors duration-300">
+        <header className="h-16 bg-white dark:bg-slate-950 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between px-4 md:px-8 shadow-sm z-10 transition-colors duration-300">
           <div className="flex items-center space-x-4">
-            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100 hidden md:inline">
-              Hệ thống Tri thức AI
+            <button 
+              className="md:hidden p-2 text-slate-500 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg"
+              onClick={() => setIsSidebarOpen(true)}
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <h2 className="text-lg font-bold text-slate-800 dark:text-slate-100">
+              <span className="md:hidden tracking-tight">Tri thức AI</span>
+              <span className="hidden md:inline">Hệ thống Tri thức AI</span>
             </h2>
           </div>
 
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3 md:space-x-6">
             {/* Theme Toggle */}
             <button 
               onClick={() => setIsDark(!isDark)}
@@ -143,12 +170,12 @@ export default function MainLayout({ children, role }) {
             </button>
 
             {/* Profile */}
-            <div className="flex items-center space-x-3 border-l border-slate-200 dark:border-slate-700 pl-6">
+            <div className="flex items-center space-x-3 border-l border-slate-200 dark:border-slate-700 pl-3 md:pl-6">
               <div className="text-right hidden sm:block">
                 <p className="text-sm font-bold text-slate-800 dark:text-slate-200">{profile.name}</p>
                 <p className="text-[10px] text-slate-500 dark:text-slate-400 uppercase tracking-wider">{profile.dept}</p>
               </div>
-              <div className={`w-10 h-10 rounded-xl flex items-center justify-center shadow-sm ${profile.color}`}>
+              <div className={`w-8 h-8 md:w-10 md:h-10 rounded-xl flex items-center justify-center shadow-sm ${profile.color}`}>
                 {profile.icon}
               </div>
             </div>
@@ -156,7 +183,7 @@ export default function MainLayout({ children, role }) {
         </header>
 
         {/* Dynamic Pages */}
-        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 p-8 relative transition-colors duration-300">
+        <main className="flex-1 overflow-y-auto bg-slate-50 dark:bg-slate-900 p-4 md:p-8 relative transition-colors duration-300">
           {children}
         </main>
       </div>

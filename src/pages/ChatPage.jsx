@@ -191,30 +191,14 @@ export default function ChatPage() {
   };
 
   return (
-    <div className="flex h-full gap-6 animate-fadeIn">
+    <div className="flex flex-col lg:flex-row h-full gap-4 lg:gap-6 animate-fadeIn">
       {/* Chat Area */}
-      <div className="flex-1 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col overflow-hidden transition-colors duration-300">
+      <div className="flex-1 min-h-[500px] lg:min-h-0 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col overflow-hidden transition-colors duration-300">
         
-        <div className="p-4 border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 flex items-center justify-between">
-          <div className="flex items-center space-x-3">
-            <div className="w-9 h-9 rounded-xl bg-blue-100 dark:bg-blue-900/40 text-blue-600 dark:text-blue-400 flex items-center justify-center">
-              <Terminal className="w-5 h-5" />
-            </div>
-            <div>
-              <h2 className="text-sm font-bold text-slate-800 dark:text-slate-100">RAG AI Assistant</h2>
-              <p className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium tracking-wide">SECURE CONNECTION</p>
-            </div>
-          </div>
-          <div className="flex items-center space-x-2 text-xs text-slate-400">
-            <span className="bg-slate-200 dark:bg-slate-700 dark:text-slate-300 px-2 py-0.5 rounded font-mono">FastAPI</span>
-            <span className="bg-slate-200 dark:bg-slate-700 dark:text-slate-300 px-2 py-0.5 rounded font-mono">GPT-4o</span>
-          </div>
-        </div>
-
         <div className="flex-1 p-6 overflow-y-auto space-y-6">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
-              <div className={`max-w-[80%] rounded-2xl p-4 shadow-sm relative space-y-3 ${
+              <div className={`max-w-[90%] md:max-w-[80%] rounded-2xl p-3 md:p-4 shadow-sm relative space-y-3 ${
                 msg.sender === 'user'
                   ? 'bg-shb-navy dark:bg-blue-600 text-white rounded-tr-none'
                   : 'bg-slate-50 dark:bg-slate-700/50 text-slate-800 dark:text-slate-200 rounded-tl-none border border-slate-200 dark:border-slate-600'
@@ -251,18 +235,19 @@ export default function ChatPage() {
           )}
         </div>
 
-        <div className="p-4 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center space-x-3">
+        {/* Input Bar */}
+        <div className="p-3 md:p-4 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center space-x-2 md:space-x-3">
           <input
             type="text"
             placeholder="Nhập yêu cầu tra cứu (VD: 'cho vay', 'an toàn vốn', 'phân loại nợ')..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
-            className="flex-1 px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:border-shb-orange dark:focus:border-shb-orange bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm font-medium"
+            className="flex-1 px-3 md:px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-600 focus:outline-none focus:border-shb-orange dark:focus:border-shb-orange bg-slate-50 dark:bg-slate-900 text-slate-800 dark:text-slate-100 text-sm font-medium"
           />
           <button
             onClick={handleSend}
-            className="p-3 bg-shb-orange text-white rounded-xl hover:bg-shb-orange-hover transition-colors shadow-md shadow-shb-orange/20 active:scale-95"
+            className="p-3 bg-shb-orange text-white rounded-xl hover:bg-shb-orange-hover transition-colors shadow-md shadow-shb-orange/20 active:scale-95 shrink-0"
           >
             <Send className="w-5 h-5" />
           </button>
@@ -270,7 +255,7 @@ export default function ChatPage() {
       </div>
 
       {/* Visual Workspace (Right Panel) */}
-      <div className="w-[450px] bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col overflow-hidden transition-colors duration-300">
+      <div className="h-[450px] lg:h-auto w-full lg:w-[350px] xl:w-[450px] shrink-0 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col overflow-hidden transition-colors duration-300">
         <div className="flex border-b border-slate-100 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
           <button
             onClick={() => setActiveTab('timeline')}

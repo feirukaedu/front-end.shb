@@ -87,13 +87,13 @@ export default function IngestPage() {
   };
 
   return (
-    <div className="max-w-6xl mx-auto h-full flex flex-col space-y-6">
+    <div className="max-w-6xl w-full mx-auto h-full flex flex-col space-y-4 md:space-y-6 px-4 md:px-8 py-6 md:py-8">
       
       {/* Tab Navigation */}
-      <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-fit">
+      <div className="flex bg-slate-100 dark:bg-slate-800 p-1 rounded-xl w-full md:w-fit mx-auto md:mx-0">
         <button
           onClick={() => setActiveTab('upload')}
-          className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-colors flex items-center space-x-2 ${
+          className={`flex-1 md:flex-none justify-center px-4 md:px-6 py-2.5 text-sm font-bold rounded-lg transition-colors flex items-center space-x-2 ${
             activeTab === 'upload' 
               ? 'bg-white dark:bg-slate-700 text-shb-orange dark:text-orange-400 shadow-sm' 
               : 'text-slate-500 dark:text-slate-400'
@@ -103,7 +103,7 @@ export default function IngestPage() {
         </button>
         <button
           onClick={() => setActiveTab('repository')}
-          className={`px-6 py-2.5 text-sm font-bold rounded-lg transition-colors flex items-center space-x-2 ${
+          className={`flex-1 md:flex-none justify-center px-4 md:px-6 py-2.5 text-sm font-bold rounded-lg transition-colors flex items-center space-x-2 ${
             activeTab === 'repository' 
               ? 'bg-white dark:bg-slate-700 text-shb-orange dark:text-orange-400 shadow-sm' 
               : 'text-slate-500 dark:text-slate-400'
@@ -114,8 +114,8 @@ export default function IngestPage() {
       </div>
 
       {activeTab === 'upload' && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-8 animate-slideDown max-w-4xl">
-          <form onSubmit={handleSubmit} className="space-y-8">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 md:p-8 animate-slideDown max-w-4xl mx-auto w-full">
+          <form onSubmit={handleSubmit} className="space-y-6 md:space-y-8">
             {/* File Dropzone */}
             <div className="border-2 border-dashed border-slate-300 dark:border-slate-600 rounded-xl p-8 hover:border-shb-orange dark:hover:border-shb-orange transition-colors bg-slate-50 dark:bg-slate-900/50 flex flex-col items-center justify-center text-center cursor-pointer relative">
               <input type="file" onChange={handleFileChange} className="absolute inset-0 opacity-0 cursor-pointer" />
@@ -132,7 +132,7 @@ export default function IngestPage() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
               <div>
                 <label className="block text-xs font-bold text-slate-500 dark:text-slate-400 uppercase mb-2">Số Hiệu</label>
                 <input type="text" value={docNumber} onChange={e => setDocNumber(e.target.value)} className="w-full px-4 py-3 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-800 dark:text-white focus:border-shb-orange outline-none" required />
@@ -156,10 +156,10 @@ export default function IngestPage() {
             </div>
 
             <div className="border-t border-slate-100 dark:border-slate-700 pt-6">
-              <div className="flex justify-between items-center mb-4">
+              <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3 sm:gap-0">
                 <h3 className="font-bold text-slate-800 dark:text-white">Liên kết pháp lý</h3>
-                <button type="button" onClick={addRelationship} className="px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-lg text-sm hover:bg-slate-200">
-                  + Thêm liên kết
+                <button type="button" onClick={addRelationship} className="w-full sm:w-auto px-4 py-2 bg-slate-100 dark:bg-slate-700 text-slate-700 dark:text-slate-200 font-bold rounded-lg text-sm hover:bg-slate-200 flex justify-center items-center">
+                  <Plus className="w-4 h-4 mr-1" /> Thêm liên kết
                 </button>
               </div>
               <div className="space-y-4">
@@ -203,8 +203,8 @@ export default function IngestPage() {
       )}
 
       {activeTab === 'repository' && (
-        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-8 animate-slideDown">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <div className="bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm p-5 md:p-8 animate-slideDown">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-6">
             {ingestedDocs.map((doc) => (
               <div key={doc.id} className="p-5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50">
                 <div className="mb-3">
