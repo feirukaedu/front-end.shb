@@ -1,6 +1,7 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Send, BookOpen, ShieldAlert, GitBranch, History, Clock, FileText, Layers, Terminal } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import ForceGraph2D from 'react-force-graph-2d';
 
 export default function ChatPage() {
   const [messages, setMessages] = useState([
@@ -15,6 +16,38 @@ export default function ChatPage() {
   const [activeTab, setActiveTab] = useState('timeline'); // timeline | graph
   const [selectedCitation, setSelectedCitation] = useState(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [currentTopic, setCurrentTopic] = useState('cho vay'); // 'cho vay' | 'an toan von' | 'phan loai no'
+  const graphRef = useRef();
+
+  useEffect(() => {
+    if (graphRef.current && activeTab === 'graph') {
+      graphRef.current.d3Force('charge').strength(-400); 
+      graphRef.current.d3Force('link').distance(100); 
+      graphRef.current.zoomToFit(200, 50);
+    }
+  }, [currentTopic, activeTab]);
+
+  const graphDataScenarios = {
+    'cho vay': {
+      nodes: [
+        { id: 'tt39', name: 'TT 39', color: '#002654', val: 20, desc: 'Bản gốc' },
+        { id: 'tt06', name: 'TT 06', color: '#002654', val: 20, desc: 'Sửa đổi' },
+        { id: 'tt10', name: 'TT 10', color: '#F36F21', val: 25, desc: 'Đình chỉ' }
+      ],
+      links: [
+        { source: 'tt06', target: 'tt39', name: 'Sửa đổi', color: '#64748b' },
+        { source: 'tt10', target: 'tt06', name: 'Đình chỉ', color: '#F36F21' }
+      ]
+    },
+    'an toan von': {
+      nodes: [{ id: 'tt41', name: 'TT 41', color: '#002654', val: 30, desc: 'Đang hiệu lực' }],
+      links: []
+    },
+    'phan loai no': {
+      nodes: [{ id: 'tt11', name: 'TT 11', color: '#002654', val: 30, desc: 'Đang hiệu lực' }],
+      links: []
+    }
+  };
 
   const mockCitations = {
     'cit-1': {
@@ -34,6 +67,12 @@ export default function ChatPage() {
       effectiveDate: '01/09/2023',
       expiryDate: 'Đang hiệu lực',
       content: 'Ngưng hiệu lực thi hành đối với khoản 8, khoản 9 và khoản 10 Điều 8 của Thông tư số 39/2016/TT-NHNN (đã được bổ sung bởi khoản 2 Điều 1 Thông tư số 06/2023/TT-NHNN).'
+    },
+    'cit-4': {
+      title: 'Điều 10 - TT 11/2021/TT-NHNN',
+      effectiveDate: '01/10/2021',
+      expiryDate: 'Đang hiệu lực',
+      content: 'Tổ chức tín dụng thực hiện phân loại nợ theo 05 nhóm như sau: Nhóm 1 (Nợ đủ tiêu chuẩn), Nhóm 2 (Nợ cần chú ý), Nhóm 3 (Nợ dưới tiêu chuẩn), Nhóm 4 (Nợ nghi ngờ), Nhóm 5 (Nợ có khả năng mất vốn).'
     }
   };
 
@@ -47,6 +86,11 @@ export default function ChatPage() {
     'an toan von': {
       text: 'Theo Thông tư 41/2016/TT-NHNN, tổ chức tín dụng phải duy trì tỷ lệ an toàn vốn (CAR) tối thiểu 8%.',
       citations: ['cit-1'],
+      hasConflict: false
+    },
+    'phan loai no': {
+      text: 'Theo Thông tư 11/2021/TT-NHNN, tổ chức tín dụng phải thực hiện phân loại nợ thành 5 nhóm: Nợ đủ tiêu chuẩn, Nợ cần chú ý, Nợ dưới tiêu chuẩn, Nợ nghi ngờ, và Nợ có khả năng mất vốn [cit-4]. Việc phân loại nợ phải được thực hiện ít nhất mỗi quý một lần.',
+      citations: ['cit-4'],
       hasConflict: false
     }
   };
@@ -66,7 +110,7 @@ export default function ChatPage() {
     setIsLoading(true);
 
     setTimeout(() => {
-      let aiResponseText = 'Hệ thống không tìm thấy kết quả. Vui lòng thử các từ khóa như: "cho vay", "an toan von".';
+      let aiResponseText = 'Hệ thống không tìm thấy kết quả. Vui lòng thử các từ khóa như: "cho vay", "an toàn vốn", "phân loại nợ".';
       let citations = [];
       let hasConflict = false;
       let conflictMsg = '';
@@ -74,12 +118,20 @@ export default function ChatPage() {
       const query = userMessage.text.toLowerCase();
       if (query.includes('cho vay') || query.includes('mục đích') || query.includes('thông tư 39') || query.includes('thông tư 06')) {
         const qa = mockQA['cho vay'];
+        setCurrentTopic('cho vay');
         aiResponseText = qa.text;
         citations = qa.citations;
         hasConflict = qa.hasConflict;
         conflictMsg = qa.conflictMsg;
       } else if (query.includes('an toàn vốn') || query.includes('car')) {
         const qa = mockQA['an toan von'];
+        setCurrentTopic('an toan von');
+        aiResponseText = qa.text;
+        citations = qa.citations;
+        hasConflict = qa.hasConflict;
+      } else if (query.includes('phân loại nợ') || query.includes('nợ xấu')) {
+        const qa = mockQA['phan loai no'];
+        setCurrentTopic('phan loai no');
         aiResponseText = qa.text;
         citations = qa.citations;
         hasConflict = qa.hasConflict;
@@ -117,7 +169,7 @@ export default function ChatPage() {
       const matchIndex = match.index;
       
       parts.push(text.substring(lastIndex, matchIndex));
-      const docLabel = citId === 'cit-1' ? 'TT 39/2016' : citId === 'cit-2' ? 'TT 06/2023' : 'TT 10/2023';
+      const docLabel = citId === 'cit-1' ? 'TT 39/2016' : citId === 'cit-2' ? 'TT 06/2023' : citId === 'cit-3' ? 'TT 10/2023' : 'TT 11/2021';
       parts.push(
         <button
           key={citId}
@@ -143,9 +195,6 @@ export default function ChatPage() {
       {/* Chat Area */}
       <div className="flex-1 min-h-[500px] lg:min-h-0 bg-white dark:bg-slate-800 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm flex flex-col overflow-hidden transition-colors duration-300">
         
-
-
-        {/* Chat Messages */}
         <div className="flex-1 p-6 overflow-y-auto space-y-6">
           {messages.map((msg) => (
             <div key={msg.id} className={`flex ${msg.sender === 'user' ? 'justify-end' : 'justify-start'}`}>
@@ -190,7 +239,7 @@ export default function ChatPage() {
         <div className="p-3 md:p-4 border-t border-slate-100 dark:border-slate-700 bg-white dark:bg-slate-800 flex items-center space-x-2 md:space-x-3">
           <input
             type="text"
-            placeholder="Nhập yêu cầu tra cứu..."
+            placeholder="Nhập yêu cầu tra cứu (VD: 'cho vay', 'an toàn vốn', 'phân loại nợ')..."
             value={inputText}
             onChange={(e) => setInputText(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSend()}
@@ -236,35 +285,80 @@ export default function ChatPage() {
           <AnimatePresence mode="wait">
             {activeTab === 'timeline' ? (
               <motion.div key="timeline-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-6">
-                
-                {/* Vertical Timeline component */}
-                <div className="relative pl-6 border-l-2 border-slate-200 dark:border-slate-700 space-y-8 py-2">
-                  <div className="relative">
-                    <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-800 bg-slate-400"></div>
-                    <div className="space-y-1">
-                      <span className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2 py-0.5 rounded font-bold">15/03/2017</span>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">TT 39/2016/TT-NHNN</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Bản gốc Điều 8.</p>
-                    </div>
-                  </div>
+                <div className="relative pl-6 border-l-[3px] border-slate-200 dark:border-slate-700 space-y-8 py-2 ml-2">
+                  
+                  {currentTopic === 'cho vay' && (
+                    <motion.div initial="hidden" animate="visible" variants={{
+                      hidden: { opacity: 0 },
+                      visible: { opacity: 1, transition: { staggerChildren: 0.15 } }
+                    }}>
+                      <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }} className="relative group mb-8">
+                        <div className="absolute -left-[33px] top-2 w-4 h-4 rounded-full border-[3px] border-white dark:border-slate-800 bg-slate-400 ring-4 ring-slate-100 dark:ring-slate-800 transition-all group-hover:scale-125"></div>
+                        <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full font-bold">15/03/2017</span>
+                            <span className="text-[10px] text-slate-400 font-bold uppercase tracking-wider">Bản gốc</span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">TT 39/2016/TT-NHNN</h4>
+                          <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Quy định các nhu cầu vốn không được cho vay (Điều 8).</p>
+                        </div>
+                      </motion.div>
 
-                  <div className="relative">
-                    <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-800 bg-amber-500"></div>
-                    <div className="space-y-1">
-                      <span className="text-[10px] bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 px-2 py-0.5 rounded font-bold">01/09/2023</span>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">TT 06/2023/TT-NHNN</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Sửa đổi bổ sung Khoản 8, 9, 10.</p>
-                    </div>
-                  </div>
+                      <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }} className="relative group mb-8">
+                        <div className="absolute -left-[33px] top-2 w-4 h-4 rounded-full border-[3px] border-white dark:border-slate-800 bg-amber-500 ring-4 ring-amber-50 dark:ring-amber-900/30 transition-all group-hover:scale-125"></div>
+                        <div className="bg-amber-50/50 dark:bg-amber-900/10 p-4 rounded-2xl border border-amber-200/60 dark:border-amber-800/50 shadow-sm hover:shadow-md transition-shadow">
+                          <div className="flex items-center justify-between mb-2">
+                            <span className="text-[10px] bg-amber-100 dark:bg-amber-900/50 text-amber-700 dark:text-amber-400 px-2.5 py-1 rounded-full font-bold">01/09/2023</span>
+                            <span className="text-[10px] text-amber-500 font-bold uppercase tracking-wider flex items-center gap-1"><History className="w-3 h-3"/> Sửa đổi</span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">TT 06/2023/TT-NHNN</h4>
+                          <p className="text-xs text-slate-600 dark:text-slate-400 font-medium leading-relaxed">Bổ sung khoản 8, 9, 10 (Cấm cho vay đặt cọc, góp vốn).</p>
+                        </div>
+                      </motion.div>
 
-                  <div className="relative">
-                    <div className="absolute -left-[31px] top-1 w-4 h-4 rounded-full border-2 border-white dark:border-slate-800 bg-emerald-500"></div>
-                    <div className="space-y-1">
-                      <span className="text-[10px] bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded font-bold">01/09/2023</span>
-                      <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100">TT 10/2023/TT-NHNN</h4>
-                      <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">Đình chỉ hiệu lực các khoản mới sửa.</p>
-                    </div>
-                  </div>
+                      <motion.div variants={{ hidden: { opacity: 0, y: 10 }, visible: { opacity: 1, y: 0 } }} className="relative group">
+                        <div className="absolute -left-[33px] top-2 w-4 h-4 rounded-full border-[3px] border-white dark:border-slate-800 bg-emerald-500 ring-4 ring-emerald-50 dark:ring-emerald-900/30 transition-all group-hover:scale-125 shadow-[0_0_10px_rgba(16,185,129,0.5)]"></div>
+                        <div className="bg-emerald-50/50 dark:bg-emerald-900/10 p-4 rounded-2xl border border-emerald-200/60 dark:border-emerald-800/50 shadow-md hover:shadow-lg transition-shadow relative overflow-hidden">
+                          <div className="absolute right-0 top-0 w-16 h-16 bg-emerald-500/10 rounded-full blur-xl -mr-4 -mt-4"></div>
+                          <div className="flex items-center justify-between mb-2 relative z-10">
+                            <span className="text-[10px] bg-emerald-100 dark:bg-emerald-900/50 text-emerald-700 dark:text-emerald-400 px-2.5 py-1 rounded-full font-bold">01/09/2023</span>
+                            <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold uppercase tracking-wider flex items-center gap-1"><ShieldAlert className="w-3 h-3"/> Đình chỉ</span>
+                          </div>
+                          <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1 relative z-10">TT 10/2023/TT-NHNN</h4>
+                          <p className="text-xs text-emerald-800 dark:text-emerald-200 font-medium leading-relaxed relative z-10">Ngưng hiệu lực thi hành các khoản cấm mới của TT 06. Áp dụng quy định cũ.</p>
+                        </div>
+                      </motion.div>
+                    </motion.div>
+                  )}
+
+                  {currentTopic === 'an toan von' && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative group">
+                      <div className="absolute -left-[33px] top-2 w-4 h-4 rounded-full border-[3px] border-white dark:border-slate-800 bg-blue-500 ring-4 ring-blue-50 dark:ring-blue-900/30 transition-all group-hover:scale-125"></div>
+                      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full font-bold">01/01/2020</span>
+                          <span className="text-[10px] text-blue-500 font-bold uppercase tracking-wider">Đang hiệu lực</span>
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">TT 41/2016/TT-NHNN</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Quy định về tỷ lệ an toàn vốn (CAR) tối thiểu 8%.</p>
+                      </div>
+                    </motion.div>
+                  )}
+
+                  {currentTopic === 'phan loai no' && (
+                    <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="relative group">
+                      <div className="absolute -left-[33px] top-2 w-4 h-4 rounded-full border-[3px] border-white dark:border-slate-800 bg-purple-500 ring-4 ring-purple-50 dark:ring-purple-900/30 transition-all group-hover:scale-125"></div>
+                      <div className="bg-white dark:bg-slate-800 p-4 rounded-2xl border border-slate-200 dark:border-slate-700 shadow-sm hover:shadow-md transition-shadow">
+                        <div className="flex items-center justify-between mb-2">
+                          <span className="text-[10px] bg-slate-100 dark:bg-slate-700 text-slate-600 dark:text-slate-300 px-2.5 py-1 rounded-full font-bold">01/10/2021</span>
+                          <span className="text-[10px] text-purple-500 font-bold uppercase tracking-wider">Đang hiệu lực</span>
+                        </div>
+                        <h4 className="text-sm font-bold text-slate-800 dark:text-slate-100 mb-1">TT 11/2021/TT-NHNN</h4>
+                        <p className="text-xs text-slate-500 dark:text-slate-400 font-medium leading-relaxed">Quy định phân loại nợ và trích lập dự phòng rủi ro.</p>
+                      </div>
+                    </motion.div>
+                  )}
+
                 </div>
 
                 {selectedCitation && mockCitations[selectedCitation] && (
@@ -280,33 +374,52 @@ export default function ChatPage() {
                 )}
               </motion.div>
             ) : (
-              <motion.div key="graph-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full flex flex-col items-center justify-center">
-                <div className="w-full aspect-square bg-slate-50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700 rounded-xl relative overflow-hidden flex items-center justify-center">
-                  <svg className="w-full h-full" viewBox="0 0 400 300">
-                    <defs>
-                      <marker id="arrow" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#94a3b8" />
-                      </marker>
-                      <marker id="arrow-active" viewBox="0 0 10 10" refX="22" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
-                        <path d="M 0 0 L 10 5 L 0 10 z" fill="#F36F21" />
-                      </marker>
-                    </defs>
+              <motion.div key="graph-tab" initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="h-full flex flex-col items-center justify-start">
+                
+                <div className="w-full bg-slate-50 dark:bg-slate-900 p-3 rounded-xl border border-slate-200 dark:border-slate-700 mb-4 flex items-center space-x-2">
+                  <div className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></div>
+                  <span className="text-[10px] font-mono text-slate-600 dark:text-slate-400">NEO4J / KNOWLEDGE GRAPH CONNECTED</span>
+                </div>
 
-                    <line x1="200" y1="210" x2="100" y2="110" stroke="#94a3b8" strokeWidth="2" strokeDasharray="4 4" markerEnd="url(#arrow)" />
-                    <text x="130" y="150" fill="#64748b" className="text-[9px] font-bold" textAnchor="middle" stroke="transparent" strokeWidth="3" paintOrder="stroke">Sửa đổi</text>
-
-                    <line x1="100" y1="110" x2="300" y2="110" stroke="#F36F21" strokeWidth="2" markerEnd="url(#arrow-active)" />
-                    <text x="200" y="100" fill="#F36F21" className="text-[9px] font-bold" textAnchor="middle" stroke="transparent" strokeWidth="3" paintOrder="stroke">Ngưng hiệu lực</text>
-
-                    <circle cx="200" cy="210" r="24" fill="#002654" />
-                    <text x="200" y="213" fill="white" className="text-[9px] font-bold" textAnchor="middle">TT 39</text>
-
-                    <circle cx="100" cy="110" r="24" fill="#002654" />
-                    <text x="100" y="113" fill="white" className="text-[9px] font-bold" textAnchor="middle">TT 06</text>
-
-                    <circle cx="300" cy="110" r="26" fill="#F36F21" />
-                    <text x="300" y="113" fill="white" className="text-[9px] font-bold" textAnchor="middle">TT 10</text>
-                  </svg>
+                <div className="w-full flex-1 min-h-[500px] bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl relative overflow-hidden flex items-center justify-center shadow-inner">
+                  <ForceGraph2D
+                    ref={graphRef}
+                    width={400}
+                    height={500}
+                    graphData={graphDataScenarios[currentTopic]}
+                    nodeLabel="desc"
+                    nodeColor="color"
+                    linkColor="color"
+                    linkWidth={2}
+                    linkDirectionalArrowLength={4}
+                    linkDirectionalArrowRelPos={1}
+                    linkCurvature={0.2}
+                    d3AlphaDecay={0.02}
+                    d3VelocityDecay={0.3}
+                    cooldownTicks={100}
+                    onEngineStop={() => {
+                      if (graphRef.current) {
+                        graphRef.current.zoomToFit(400, 50);
+                      }
+                    }}
+                    nodeCanvasObject={(node, ctx, globalScale) => {
+                      const label = node.name;
+                      const fontSize = 14 / globalScale; 
+                      ctx.font = `bold ${fontSize}px Sans-Serif`;
+                      
+                      const radius = Math.sqrt(node.val) * 2; 
+                      
+                      ctx.beginPath();
+                      ctx.arc(node.x, node.y, radius, 0, 2 * Math.PI, false);
+                      ctx.fillStyle = node.color;
+                      ctx.fill();
+                      
+                      ctx.textAlign = 'center';
+                      ctx.textBaseline = 'middle';
+                      ctx.fillStyle = '#ffffff';
+                      ctx.fillText(label, node.x, node.y);
+                    }}
+                  />
                 </div>
               </motion.div>
             )}
