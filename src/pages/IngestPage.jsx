@@ -164,15 +164,15 @@ export default function IngestPage() {
               </div>
               <div className="space-y-4">
                 {relationships.map((rel, index) => (
-                  <div key={index} className="grid grid-cols-1 sm:grid-cols-3 gap-3 bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
-                    <select value={rel.type} onChange={e => updateRelationship(index, 'type', e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                  <div key={index} className="grid grid-cols-1 sm:grid-cols-12 gap-3 bg-slate-50 dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-700">
+                    <select value={rel.type} onChange={e => updateRelationship(index, 'type', e.target.value)} className="sm:col-span-3 w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
                       {relationshipTypes.map(t => <option key={t.value} value={t.value}>{t.label}</option>)}
                     </select>
-                    <select value={rel.targetDocId} onChange={e => updateRelationship(index, 'targetDocId', e.target.value)} className="w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
+                    <select value={rel.targetDocId} onChange={e => updateRelationship(index, 'targetDocId', e.target.value)} className="sm:col-span-3 w-full px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white">
                       <option value="">- Chọn văn bản -</option>
                       {ingestedDocs.map(doc => <option key={doc.id} value={doc.id}>{doc.docNumber}</option>)}
                     </select>
-                    <div className="flex gap-2">
+                    <div className="sm:col-span-6 flex gap-2">
                       <input type="text" placeholder="Phạm vi (VD: Điều 8)" value={rel.clauses} onChange={e => updateRelationship(index, 'clauses', e.target.value)} className="flex-1 px-3 py-2.5 rounded-lg border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-800 text-slate-800 dark:text-white" />
                       <button type="button" onClick={() => removeRelationship(index)} className="px-4 py-2 bg-rose-50 dark:bg-rose-900/30 text-rose-500 rounded-lg">
                         <Trash2 className="w-5 h-5" />

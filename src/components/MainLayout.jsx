@@ -25,8 +25,7 @@ export default function MainLayout({ children, role }) {
 
   if (role === 'user') {
     menuItems = [
-      { path: '/chat', name: 'Trợ lý Tra cứu AI', icon: <MessageSquare className="w-5 h-5" /> },
-      { path: '/compare', name: 'Đối chiếu Văn bản', icon: <Columns className="w-5 h-5" /> }
+      { path: '/chat', name: 'Trợ lý Tra cứu AI', icon: <MessageSquare className="w-5 h-5" /> }
     ];
     profile = {
       name: 'Chuyên viên Tín dụng',
@@ -36,8 +35,7 @@ export default function MainLayout({ children, role }) {
     };
   } else if (role === 'admin') {
     menuItems = [
-      { path: '/ingest', name: 'Quản lý Nạp liệu', icon: <Upload className="w-5 h-5" /> },
-      { path: '/settings', name: 'Cấu hình Hệ thống', icon: <Settings2 className="w-5 h-5" /> }
+      { path: '/ingest', name: 'Quản lý Nạp liệu', icon: <Upload className="w-5 h-5" /> }
     ];
     profile = {
       name: 'Chuyên viên Pháp chế',
