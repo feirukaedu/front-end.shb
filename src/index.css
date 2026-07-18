@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --color-shb-orange: #F36F21;
+  --color-shb-orange-hover: #D75A1A;
+  --color-shb-navy: #002654;
+  --color-shb-navy-light: #0d3c75;
+  --color-shb-navy-dark: #001838;
+}
+
+body {
+  @apply bg-slate-50 text-slate-900 dark:bg-slate-900 dark:text-slate-100 transition-colors duration-300;
+}
