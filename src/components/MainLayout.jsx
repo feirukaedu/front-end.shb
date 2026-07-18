@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { 
   MessageSquare, Upload, BarChart2, Layers, LogOut, Sun, Moon,
-  Columns, Settings2, User, ShieldCheck, Settings, Menu, X
+  Columns, Settings2, User, ShieldCheck, Settings, Menu, X, Database
 } from 'lucide-react';
 
 export default function MainLayout({ children, role }) {
@@ -40,7 +40,8 @@ export default function MainLayout({ children, role }) {
     };
   } else if (role === 'admin') {
     menuItems = [
-      { path: '/ingest', name: 'Quản lý Nạp liệu', icon: <Upload className="w-5 h-5" /> }
+      { path: '/ingest', name: 'Quản lý Nạp liệu', icon: <Upload className="w-5 h-5" /> },
+      { path: '/library', name: 'Kho dữ liệu', icon: <Database className="w-5 h-5" /> }
     ];
     profile = {
       name: 'Chuyên viên Pháp chế',

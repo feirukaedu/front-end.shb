@@ -65,3 +65,22 @@ export const mockQA = {
     hasConflict: false
   }
 };
+
+export let mockIngestedDocs = [
+  {
+    id: 'doc-1', docNumber: '39/2016/TT-NHNN', title: 'Thông tư quy định về hoạt động cho vay',
+    effectiveDate: '2017-03-15', status: 'Hết hiệu lực một phần', relationsCount: 2
+  },
+  {
+    id: 'doc-2', docNumber: '41/2016/TT-NHNN', title: 'Thông tư quy định tỷ lệ an toàn vốn',
+    effectiveDate: '2020-01-01', status: 'Đang hiệu lực', relationsCount: 1
+  },
+  {
+    id: 'doc-3', docNumber: '06/2023/TT-NHNN', title: 'Sửa đổi bổ sung Thông tư 39',
+    effectiveDate: '2023-09-01', status: 'Ngưng hiệu lực một phần', relationsCount: 3
+  },
+  {
+    id: 'doc-4', docNumber: '10/2023/TT-NHNN', title: 'Đình chỉ hiệu lực Thông tư 06',
+    effectiveDate: '2023-09-01', status: 'Đang hiệu lực', relationsCount: 1
+  }
+];
