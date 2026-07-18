@@ -4,6 +4,7 @@ import PortalSelectionPage from './pages/PortalSelectionPage';
 import MainLayout from './components/MainLayout';
 import ChatPage from './pages/ChatPage';
 import IngestPage from './pages/IngestPage';
+import LibraryPage from './pages/LibraryPage';
 import BenchmarkPage from './pages/BenchmarkPage';
 import './App.css';
 
@@ -18,6 +19,7 @@ function App() {
         
         {/* Admin Role (Khối Pháp chế) */}
         <Route path="/ingest" element={<MainLayout role="admin"><IngestPage /></MainLayout>} />
+        <Route path="/library" element={<MainLayout role="admin"><LibraryPage /></MainLayout>} />
         
         {/* Judge Role (Ban giám khảo) */}
         <Route path="/benchmark" element={<MainLayout role="judge"><BenchmarkPage /></MainLayout>} />
